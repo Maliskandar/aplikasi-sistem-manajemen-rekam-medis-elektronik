@@ -10,9 +10,6 @@
 </head>
 
 <body class="bg-gray-100">
-    <header class="p-4 bg-blue-600 text-white text-center">
-        <h1>Cattery Management Platform</h1>
-    </header>
     <section class="flex justify-center items-center pt-12 pb-12">
         <div class="w-full max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-md">
             <form class="space-y-6" action="{{ route('register') }}" method="POST">
@@ -67,9 +64,6 @@
             @endif
         </div>
     </section>
-    <footer class="p-4 bg-gray-800 text-white text-center">
-        <p>&copy; {{ date('Y') }} Universitas Amikom Yogyakarta. All rights reserved.</p>
-    </footer>
 </body>
 
 </html>

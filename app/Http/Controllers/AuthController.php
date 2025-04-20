@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -20,25 +19,32 @@ class AuthController extends Controller
     {
         // Validating the input
         $request->validate([
-            'username' => 'required|alpha_num',
+            'email' => 'required',
             'password' => 'required|min:8',
         ]);
 
         // Attempt to authenticate the user
-        if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
+        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             // Authentication passed, get the authenticated user
             $user = Auth::user();
 
+            // Store a success message in session
+            session()->flash('success', 'Login successful! Welcome ' . $user->username);
+
             // Redirect based on user role
             if ($user->role === 'admin') {
-                return redirect()->route('admin.dashboard');
-            } elseif ($user->role === 'customer') {
-                return redirect()->route('customer.dashboard');
+                return redirect()->route('admin.dashboard')->with('success', 'Login berhasil! Selamat 
+                datang Admin Praktik Mandiri Bidan Delima 🖐️');
+            } elseif ($user->role === 'bidan') {
+                return redirect()->route('bidan.dashboard')->with('success', 'Login berhasil! Selamat 
+                datang Bidan 🖐️');
+            } elseif ($user->role === 'asisten') {
+                return redirect()->route('asisten.dashboard');
             }
-        }
 
-        // If authentication fails, redirect back to the login with an error message
-        return redirect('/login')->with('error', 'Invalid credentials or role not recognized.');
+            // If authentication fails, redirect back to the login with an error message
+            return redirect('/login')->with('error', 'Invalid credentials or role not recognized.');
+        }
     }
 
 
@@ -52,9 +58,10 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        // Redirect ke halaman login
-        return redirect()->route('login')->with('message', 'You have successfully logged out.');
+        // Redirect ke halaman welcome
+        return redirect('/')->with('message', 'Anda berhasil keluar.');
     }
+
 
     // Menampilkan form registrasi
     public function showRegistrationForm()
@@ -78,15 +85,15 @@ class AuthController extends Controller
         $user = User::create([
             'username' => $request->username,
             'password' => Hash::make($request->password),
-            'role' => 'customer',
+            'role' => 'pasien',
         ]);
 
         // Simpan data ke tabel costumer
-        Customer::create([
+        User::create([
             'nama' => $request->nama,
             'info_kontak' => $request->info_kontak,
             'email' => $request->email,
-            'id_customer' => $user->id, // Relasi dengan user
+            'id_user' => $user->id, // Relasi dengan user
         ]);
 
         // Redirect ke halaman login

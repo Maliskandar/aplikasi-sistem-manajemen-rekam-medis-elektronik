@@ -13,10 +13,10 @@
                         </path>
                     </svg>
                 </button>
-                <a href="#" class="flex ms-2 md:me-24">
-                    <img src="/img/amikom.png" class="h-8 me-3" alt="Logo" />
+                <a href="/admin/dashboard" class="flex ms-2 md:me-24">
+                    <img src="/img/WD.png" class="h-8 me-3" alt="Admin Logo" />
                     <span class="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">
-                        <h1>{{ $title }}</h1>
+                        <h1>Panel Bidan</h1>
                     </span>
                 </a>
             </div>
@@ -40,8 +40,9 @@
                             class="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
                             aria-expanded="false" data-dropdown-toggle="dropdown-user">
                             <span class="sr-only">Open user menu</span>
-                            <img class="w-8 h-8 rounded-full" src="#" alt="user photo">
-                        </button>
+                            <img class="w-8 h-8 rounded-full"
+                                src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
+                                alt="user photo"> </button>
                     </div>
                     <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded shadow dark:bg-gray-700 dark:divide-gray-600"
                         id="dropdown-user">
