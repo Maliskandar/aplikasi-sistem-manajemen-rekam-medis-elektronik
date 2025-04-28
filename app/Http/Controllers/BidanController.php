@@ -31,13 +31,21 @@ class BidanController extends Controller
     {
         $service = PatientService::with('patient')->findOrFail($id);
 
+        // ➡ Update status otomatis jadi "Sedang Diperiksa"
+        if ($service->status === 'Siap Diperiksa') {
+            $service->update([
+                'status' => 'Sedang Diperiksa',
+            ]);
+        }
+
+        // ➡ Lanjutkan ke form pemeriksaan sesuai jenis layanan
         switch ($service->service_type) {
             case 'ANC':
                 return view('bidan.forms.anc', compact('service'));
             case 'PNC':
                 return view('bidan.forms.pnc', compact('service'));
             case 'KB & Kes Pro':
-                return view('bidan.forms.kb&KesPro', compact('service'));
+                return view('bidan.forms.kbKesPro', compact('service')); // perbaiki nama file nya (ga boleh ada &)
             case 'BBL':
                 return view('bidan.forms.bbl', compact('service'));
             case 'Umum':
@@ -46,6 +54,21 @@ class BidanController extends Controller
                 abort(404, 'Form belum tersedia.');
         }
     }
+
+
+    // public function mulaiPeriksa($id)
+    // {
+    //     $service = \App\Models\PatientService::findOrFail($id);
+
+    //     if ($service->status === 'Siap Diperiksa') {
+    //         $service->update([
+    //             'status' => 'Sedang Diperiksa',
+    //         ]);
+    //     }
+
+    //     return redirect()->back()->with('success', 'Pasien sedang dalam pemeriksaan.');
+    // }
+
 
     public function simpanAnc(Request $request, $id)
     {
@@ -72,7 +95,7 @@ class BidanController extends Controller
             'patient_service_id' => $service->id
         ]));
 
-        $service->update(['status' => 'Diperiksa']);
+        // $service->update(['status' => 'Diperiksa']);
 
         return redirect()->route('bidan.obat.form', $service->id)
             ->with('success', 'Pemeriksaan ANC disimpan. Silakan berikan resep.');
@@ -88,39 +111,36 @@ class BidanController extends Controller
     public function simpanObat(Request $request, $id)
     {
         $request->validate([
-            'nama_obat' => 'required|string',
-            'dosis' => 'nullable|string',
-            'aturan_pakai' => 'nullable|string',
-            'catatan' => 'nullable|string',
+            'nama_obat' => 'required|array',
+            'nama_obat.*' => 'required|string',
+            'dosis' => 'nullable|array',
+            'aturan_pakai' => 'nullable|array',
+            'catatan' => 'nullable|array',
         ]);
 
-        // Ambil data layanan beserta data pasien
         $service = PatientService::with('patient')->findOrFail($id);
 
-        // Simpan data resep
-        $prescription = Prescription::create([
-            'patient_service_id' => $service->id,
-            'nama_obat' => $request->nama_obat,
-            'dosis' => $request->dosis,
-            'aturan_pakai' => $request->aturan_pakai,
-            'catatan' => $request->catatan,
-        ]);
-
-        // Perbarui status pasien jika resep berhasil dibuat
-        if ($prescription) {
-            $service->update(['status' => 'Selesai']);
-
-            // Kirim notifikasi ke inbox asisten
-            Inbox::create([
-                'title' => 'Resep Obat untuk ' . $service->patient->full_name,
-                'message' => 'Bidan telah meresepkan obat untuk pasien ' . $service->patient->full_name . ' pada layanan ' . $service->service_type . '.',
+        foreach ($request->nama_obat as $index => $namaObat) {
+            Prescription::create([
                 'patient_service_id' => $service->id,
+                'nama_obat' => $namaObat,
+                'dosis' => $request->dosis[$index] ?? null,
+                'aturan_pakai' => $request->aturan_pakai[$index] ?? null,
+                'catatan' => $request->catatan[$index] ?? null,
             ]);
         }
 
-        return redirect()->route('bidan.antrean')
-            ->with('success', 'Obat berhasil diresepkan dan pasien selesai diperiksa.');
+        $service->update(['status' => 'Selesai Pemeriksaan']);
+
+        Inbox::create([
+            'title' => 'Resep Obat untuk ' . $service->patient->full_name,
+            'message' => 'Bidan telah meresepkan obat untuk pasien ' . $service->patient->full_name . ' pada layanan ' . $service->service_type . '.',
+            'patient_service_id' => $service->id,
+        ]);
+
+        return redirect()->route('bidan.antrean')->with('success', 'Semua resep berhasil disimpan dan pasien selesai diperiksa.');
     }
+
 
 
 }

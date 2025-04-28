@@ -115,38 +115,42 @@ class PatientController extends Controller
 
     // }
 
-    public function registerService(Request $request, $patientId)
+    public function registerService(Request $request)
     {
         $request->validate([
+            'patient_id' => 'required|exists:patients,id',
             'service_type' => 'required|in:ANC,INC,PNC,KB dan Kes Pro,Umum,BBL',
         ]);
 
-        $today = \Carbon\Carbon::now('Asia/Makassar'); // bukan format 'Y-m-d'
+        $today = \Carbon\Carbon::now('Asia/Makassar')->format('Y-m-d');
 
-        $queueToday = PatientService::whereDate('queue_date', $today)
+        $queueToday = \App\Models\PatientService::whereDate('queue_date', $today)
             ->where('service_type', $request->service_type)
             ->count();
 
-        $service = PatientService::create([
-            'patient_id' => $patientId,
+        $service = \App\Models\PatientService::create([
+            'patient_id' => $request->patient_id,
             'service_type' => $request->service_type,
             'queue_date' => $today,
             'queue_number' => $queueToday + 1,
             'status' => 'Siap Diperiksa',
         ]);
 
-        return redirect()->route('asisten.kunjungan')->with('success', 'Pasien berhasil didaftarkan dengan antrean #' . str_pad($service->queue_number, 3, '0', STR_PAD_LEFT));
+        return redirect()->route('asisten.kunjungan')->with('success', 'Pasien berhasil didaftarkan ke antrean!');
     }
+
 
     public function kunjunganHariIni()
     {
-        $today = \Carbon\Carbon::today();
+        $today = now()->format('Y-m-d');
+
         $kunjungan = PatientService::with('patient')
-            ->whereDate('queue_date', $today)
-            ->orderBy('created_at')
+            ->whereDate('created_at', $today)
             ->get();
 
-        return view('asisten.patients.kunjungan', compact('kunjungan'));
+        $patients = Patient::all(); // <- Tambahkan ini!
+
+        return view('asisten.patients.kunjungan', compact('kunjungan', 'patients'));
     }
 
 

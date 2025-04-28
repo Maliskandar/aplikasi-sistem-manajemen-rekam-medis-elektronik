@@ -40,13 +40,7 @@
                     @foreach ($patients as $patient)
                         <tr class="border-t">
                             <td class="px-4 py-2">{{ $loop->iteration }}</td>
-                            <td class="px-4 py-2">
-                                <button onclick="showServiceModal({{ $patient->id }}, '{{ $patient->full_name }}')"
-                                    class="text-blue-700 font-semibold hover:underline">
-                                    {{ $patient->full_name }}
-                                </button>
-                            </td>
-
+                            <td class="px-4 py-2">{{ $patient->full_name }}</td>
                             <td class="px-4 py-2">{{ $patient->nik }}</td>
                             <td class="px-4 py-2">{{ $patient->phone }}</td>
                             <td class="px-4 py-2 flex justify-center gap-2">

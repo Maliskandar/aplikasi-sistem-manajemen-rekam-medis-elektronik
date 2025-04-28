@@ -19,7 +19,14 @@ return new class extends Migration {
             $table->date('queue_date')->nullable();
 
             // Status pelayanan
-            $table->enum('status', ['Menunggu', 'Siap Diperiksa', 'Diperiksa', 'Selesai'])->default('Menunggu');
+            $table->enum('status', [
+                'Menunggu',
+                'Siap Diperiksa',
+                'Sedang Diperiksa',
+                'Selesai Pemeriksaan',
+                'Selesai Kunjungan'
+            ])->default('Menunggu');
+
             // $table->enum('status', ['Menunggu', 'Siap Diperiksa', 'Selesai Pemeriksaan', 'Sudah Bayar'])->default('Menunggu');
 
             $table->timestamps();

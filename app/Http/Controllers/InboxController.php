@@ -25,5 +25,12 @@ class InboxController extends Controller
         return view('asisten.inbox.resep-anc', compact('anc', 'resep'));
     }
 
+    public function selesaikanKunjungan($id)
+    {
+        $service = \App\Models\PatientService::findOrFail($id);
+        $service->update(['status' => 'Selesai Kunjungan']);
+
+        return redirect()->route('asisten.riwayat.kebidanan')->with('success', 'Status pasien berhasil diubah menjadi "Selesai Kunjungan".');
+    }
 
 }

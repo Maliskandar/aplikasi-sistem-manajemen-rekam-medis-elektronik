@@ -25,6 +25,14 @@
                                     class="inline-block px-4 py-1 text-sm bg-pink-600 hover:bg-pink-700 text-white rounded-lg">
                                     Lihat Resep
                                 </a>
+                                <form action="{{ route('asisten.selesai.kunjungan', $item->patient_service_id) }}"
+                                    method="POST" onsubmit="return confirm('Yakin pasien sudah membayar dan selesai?')">
+                                    @csrf
+                                    <button type="submit"
+                                        class="inline-block px-4 py-1 text-sm bg-green-600 hover:bg-green-700 text-white rounded-lg">
+                                        Pasien Sudah Bayar
+                                    </button>
+                                </form>
                             </div>
                         @endif
                     @endif

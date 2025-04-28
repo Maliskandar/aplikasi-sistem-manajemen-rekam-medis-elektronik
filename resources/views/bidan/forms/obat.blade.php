@@ -15,43 +15,44 @@
             });
         </script>
     @endif
-    <div class="max-w-xl mx-auto py-10">
-        <h1 class="text-xl font-bold text-gray-700 mb-6">Resep Obat / Vitamin</h1>
+    <div class="max-w-4xl mx-auto py-10">
+        <h1 class="text-2xl font-bold mb-6 text-gray-700">Input Resep Obat</h1>
 
-        <div class="bg-white shadow rounded-lg p-6 space-y-6">
-            <div>
-                <p class="text-sm text-gray-600">Pasien: <strong>{{ $service->patient->full_name }}</strong></p>
-                <p class="text-sm text-gray-600">Layanan: <strong>{{ $service->service_type }}</strong></p>
+        <form action="{{ route('bidan.obat.simpan', $service->id) }}" method="POST">
+            @csrf
+
+            <div id="obat-wrapper" class="space-y-6">
+                <div class="obat-item bg-white p-6 rounded-lg shadow space-y-4">
+                    <input type="text" name="nama_obat[]" placeholder="Nama Obat" class="form-input w-full" required>
+                    <input type="text" name="dosis[]" placeholder="Dosis" class="form-input w-full">
+                    <input type="text" name="aturan_pakai[]" placeholder="Aturan Pakai" class="form-input w-full">
+                    <textarea name="catatan[]" placeholder="Catatan" class="form-textarea w-full"></textarea>
+                </div>
             </div>
 
-            <form action="{{ route('bidan.obat.simpan', $service->id) }}" method="POST">
-                @csrf
-                <div class="space-y-4">
-                    <div>
-                        <label class="block font-medium">Nama Obat / Vitamin</label>
-                        <input type="text" name="nama_obat" class="form-input w-full" required>
-                    </div>
+            <div class="mt-4">
+                <button type="button" id="tambah-obat"
+                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
+                    + Tambah Obat
+                </button>
+            </div>
 
-                    <div>
-                        <label class="block font-medium">Dosis</label>
-                        <input type="text" name="dosis" class="form-input w-full">
-                    </div>
-
-                    <div>
-                        <label class="block font-medium">Aturan Pakai</label>
-                        <input type="text" name="aturan_pakai" class="form-input w-full">
-                    </div>
-
-                    <div>
-                        <label class="block font-medium">Catatan Tambahan</label>
-                        <textarea name="catatan" class="form-textarea w-full" rows="3"></textarea>
-                    </div>
-
-                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
-                        Simpan Resep
-                    </button>
-                </div>
-            </form>
-        </div>
+            <div class="mt-6">
+                <button type="submit" class="px-6 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-lg font-semibold">
+                    Simpan Semua Resep
+                </button>
+            </div>
+        </form>
     </div>
+
+    <script>
+        document.getElementById('tambah-obat').addEventListener('click', function() {
+            const wrapper = document.getElementById('obat-wrapper');
+            const item = wrapper.querySelector('.obat-item');
+            const clone = item.cloneNode(true);
+            // Reset input value
+            clone.querySelectorAll('input, textarea').forEach(input => input.value = '');
+            wrapper.appendChild(clone);
+        });
+    </script>
 @endsection
